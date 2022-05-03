@@ -13,6 +13,9 @@ class MyLabel(QLabel):
         self.flag = True
         self.x0 = event.x()
         self.y0 = event.y()
+
+        print(self.x0,self.y0)
+        print(self.x1,self.y1)
      #Mouse release event
     def mouseReleaseEvent(self,event):
         self.flag = False

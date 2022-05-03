@@ -10,6 +10,7 @@ from ColorTransferWindow import Ui_ColorTransfer_Form
 from EnhanceWindow import Ui_EnhanceForm
 from MainWindow import Ui_MainWindow
 from TestWindow import Ui_Form
+from test import MyLabel
 
 
 class MainWindow:
@@ -24,6 +25,7 @@ class MainWindow:
         self.uic.pushButton_4.clicked.connect(self.enhanceEvent)
         self.uic.pushButton_5.clicked.connect(self.clearImage)
         self.uic.pushButton.clicked.connect(self.colorTransfer)
+        self.uic.pushButton_6.clicked.connect(self.testcrop)
         # self.uic.pushButton_4.clicked.connect(self.Open_SubScreen)
         self.fname = ''
         self.original_image = ''
@@ -186,7 +188,7 @@ class MainWindow:
             self.uic.imgScreen.setPixmap(pixmap)
 
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
-
+            self.currentPixmap = pixmap
     def enhanceEvent(self):
         self.Third_window = QtWidgets.QMainWindow()
         self.uic2.setupUi(self.Third_window)
@@ -209,6 +211,7 @@ class MainWindow:
             pixmap = ImageQt.toqpixmap(im)
             self.uic.imgScreen.setPixmap(pixmap)
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+            self.currentPixmap = pixmap
         else:
             pass
 
@@ -227,6 +230,7 @@ class MainWindow:
 
             self.uic.imgScreen.setPixmap(pixmap)
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+            self.currentPixmap = pixmap
         else:
             pass
 
@@ -244,6 +248,7 @@ class MainWindow:
             pixmap = ImageQt.toqpixmap(im)
             self.uic.imgScreen.setPixmap(pixmap)
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+            self.currentPixmap = pixmap
         else:
             pass
 
@@ -262,6 +267,7 @@ class MainWindow:
 
             self.uic.imgScreen.setPixmap(pixmap)
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+            self.currentPixmap = pixmap
         else:
             pass
 
@@ -319,9 +325,12 @@ class MainWindow:
                 pixmap = ImageQt.toqpixmap(im)
                 self.uic.imgScreen.setPixmap(pixmap)
                 self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+                self.currentPixmap = pixmap
             else:
                 pass
 
+    def testcrop(self):
+       pass
     def show(self):
         self.main_win.show()
 
