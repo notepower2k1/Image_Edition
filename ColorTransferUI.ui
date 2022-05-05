@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>210</width>
-    <height>417</height>
+    <height>368</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,25 +22,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton_7">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>66</y>
-     <width>191</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="text">
-    <string>Greyscale </string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
@@ -101,8 +82,8 @@
   <widget class="QPushButton" name="pushButton_4">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>295</y>
+     <x>10</x>
+     <y>70</y>
      <width>191</width>
      <height>51</height>
     </rect>
@@ -139,8 +120,8 @@
   <widget class="QPushButton" name="pushButton_6">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>353</y>
+     <x>10</x>
+     <y>300</y>
      <width>191</width>
      <height>51</height>
     </rect>

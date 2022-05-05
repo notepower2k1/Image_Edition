@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QFileDialog, QSpinBox, QColorDialog
-from PyQt5.QtCore import Qt, QPoint, QRect, QObject
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QFileDialog, QSpinBox, QColorDialog, QMessageBox
+from PyQt5.QtCore import Qt, QPoint, QRect, QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 from PIL import Image, ImageFont, ImageDraw, ImageQt, ImageColor, ImageFilter, ImageEnhance, ImageQt
 import os
@@ -9,8 +9,8 @@ import os
 from ColorTransferWindow import Ui_ColorTransfer_Form
 from EnhanceWindow import Ui_EnhanceForm
 from MainWindow import Ui_MainWindow
-from TestWindow import Ui_Form
-from test import MyLabel
+from AddTextGUI import Ui_Form
+from ImageLabel import QImageLabel
 
 
 class MainWindow:
@@ -40,32 +40,34 @@ class MainWindow:
         self.width_img = 0
         self.heigh_img = 0
         self.font_size = 18
-
         self.currentTextColor = (0, 0, 0)
         self.currentPixmap = None
+        # crop
+        self.isCrop = False
 
     def showScreen(self):
         # Open file dialog
         self.fname, _ = QFileDialog.getOpenFileName(self.main_win, "Open File", "",
-                                                    "All Files (*);;Image Files *.jpg; *.jpeg; *.png")
+                                                    "All Files (*);;Image Files *.jpg; *.jpeg;")
 
+        # Hien thi anh trong label
         if self.fname:
             image = Image.open(self.fname)
             im = image.convert("RGBA")
 
+            # Kiem tra size cua label va anh
             label_w = self.uic.imgScreen.width()
             label_h = self.uic.imgScreen.height()
             if im.width >= label_w or im.height >= label_h:
-                self.uic.imgScreen.setScaledContents(True)
+                im = im.resize((label_w, label_h))
             else:
-                self.uic.imgScreen.setScaledContents(False)
+                pass
 
             pixmap = ImageQt.toqpixmap(im)
             self.uic.imgScreen.setPixmap(pixmap)
-
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
             self.original_image = self.fname
-
+            self.currentPixmap = pixmap
     def handleButton(self):
         modifiers = QApplication.keyboardModifiers()
         if modifiers == Qt.ShiftModifier:
@@ -78,15 +80,17 @@ class MainWindow:
             print('Mouse Click')
 
     def addText(self):
+        # Mo cua so Add Text
         self.Second_window = QtWidgets.QMainWindow()
         self.uic1.setupUi(self.Second_window)
         self.Second_window.show()
 
+        # Event click cua so color picker
         self.uic1.displayColorWidget.mouseReleaseEvent = lambda event: self.addColor()
+
         self.uic1.drawBtn.clicked.connect(self.drawText)
-
         self.uic1.textEdit.textChanged.connect(self.changeColor)
-
+        # Kiem tra radio button
         self.uic1.btnCenter.clicked.connect(self.check)
         self.uic1.btnT_L.clicked.connect(self.check)
         self.uic1.btnT_R.clicked.connect(self.check)
@@ -184,15 +188,27 @@ class MainWindow:
 
     def clearImage(self):
         if self.original_image:
-            pixmap = QPixmap(str(self.original_image))
-            self.uic.imgScreen.setPixmap(pixmap)
+            image = Image.open(self.fname)
+            im = image.convert("RGBA")
 
+            # Kiem tra size cua label va anh
+            label_w = self.uic.imgScreen.width()
+            label_h = self.uic.imgScreen.height()
+            if im.width >= label_w or im.height >= label_h:
+                im = im.resize((label_w, label_h))
+            else:
+                pass
+
+            pixmap = ImageQt.toqpixmap(im)
+            self.uic.imgScreen.setPixmap(pixmap)
             self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
             self.currentPixmap = pixmap
+
     def enhanceEvent(self):
         self.Third_window = QtWidgets.QMainWindow()
         self.uic2.setupUi(self.Third_window)
         self.Third_window.show()
+
         self.uic2.brightnessSlide.sliderReleased.connect(self.brightnessChange)
         self.uic2.sharpnessSlide.sliderReleased.connect(self.sharpnessChange)
         self.uic2.colorSlide.sliderReleased.connect(self.colorChange)
@@ -292,7 +308,6 @@ class MainWindow:
         self.uic3.pushButton_4.clicked.connect(self.eventColorTransfer)
         self.uic3.pushButton_5.clicked.connect(self.eventColorTransfer)
         self.uic3.pushButton_6.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_7.clicked.connect(self.eventColorTransfer)
 
     def eventColorTransfer(self):
         if self.fname:
@@ -300,9 +315,11 @@ class MainWindow:
                 myImage = Image.open(str(self.fname))
             else:
                 myImage = ImageQt.fromqpixmap(self.currentPixmap)
+
             btn = self.Fourth_window.sender()
             red, green, blue = myImage.split()
             temp_image = None
+
             if btn == self.uic3.pushButton:
                 temp_image = Image.merge("RGB", (green, red, blue))
             elif btn == self.uic3.pushButton_2:
@@ -313,8 +330,6 @@ class MainWindow:
                 temp_image = Image.merge("RGB", (red, blue, green))
             elif btn == self.uic3.pushButton_5:
                 temp_image = Image.merge("RGB", (blue, red, green))
-            elif btn == self.uic3.pushButton_7:
-                temp_image = myImage.convert('L')
             elif btn == self.uic3.pushButton_6:
                 self.clearImage()
             else:
@@ -330,7 +345,16 @@ class MainWindow:
                 pass
 
     def testcrop(self):
-       pass
+        if os.path.exists('cropImage.png'):
+            image = Image.open('cropImage.png')
+            im = image.convert("RGBA")
+            pixmap = ImageQt.toqpixmap(im)
+            self.uic.imgScreen.setPixmap(pixmap)
+            self.uic.imgScreen.setFixedSize(self.uic.imgScreen.width(), self.uic.imgScreen.height())
+
+        else:
+            QMessageBox.about(self.uic.centralwidget, "Error", "No Crop Image yet!!!")
+
     def show(self):
         self.main_win.show()
 
