@@ -10,7 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from ImageLabel import QImageLabel
 
 
 class Ui_MainWindow(object):
@@ -26,7 +25,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
-        self.imgScreen = QImageLabel(self.centralwidget)
+        self.imgScreen = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -184,7 +183,7 @@ class Ui_MainWindow(object):
         self.pushButton_10.setText(_translate("MainWindow", "Rotate"))
         self.pushButton_5.setText(_translate("MainWindow", "Clear"))
         self.pushButton_11.setText(_translate("MainWindow", "Filter"))
-        self.pushButton_6.setText(_translate("MainWindow", "Show Crop Image"))
+        self.pushButton_6.setText(_translate("MainWindow", "Crop"))
         self.pushButton_8.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_7.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_9.setText(_translate("MainWindow", "PushButton"))
@@ -192,15 +191,3 @@ class Ui_MainWindow(object):
 
 
 
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-
-
-
-    sys.exit(app.exec_())

@@ -1,40 +1,48 @@
-import sys
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5 import QtCore, QtGui, QtWidgets
 
+class Ui_Form(object):
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(640, 480)
+        Form.setMouseTracking(True)
+        self.label = QtWidgets.QLabel(Form)
+        self.label.setGeometry(QtCore.QRect(270, 190, 58, 15))
+        self.label.setObjectName("label")
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
 
-class Communicate(QObject):
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Form"))
+        self.label.setText(_translate("Form", "TextLabel"))
 
-    closeApp = pyqtSignal()
+class Form(QtWidgets.QWidget, Ui_Form):
+    def __init__(self, parent=None):
+        super(Form, self).__init__(parent)
+        self.setupUi(self)
+        self.setMouseTracking(True)
 
+    def mouseMoveEvent(self, e):
+        text = "x: {0},  y: {1}".format(e.x(), e.y())
+        self.label.setText(text)
+        self.label.adjustSize()
+        super(Form, self).mouseMoveEvent(e)
 
-
-class Example(QMainWindow):
-
-    def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        self.c = Communicate()
-        self.c.closeApp.connect(self.close)
-
-        self.setGeometry(300, 300, 450, 350)
-        self.setWindowTitle('Emit signal')
-        self.show()
-
-    def mousePressEvent(self, event):
-
-        self.c.closeApp.emit()
-
-
-def main():
-    app = QApplication(sys.argv)
-    ex = Example()
+    def closeEvent(self, event):
+        answer = QtWidgets.QMessageBox.question(
+            self,
+            'Are you sure you want to quit ?',
+            'Task is in progress !',
+            QtWidgets.QMessageBox.Yes,
+            QtWidgets.QMessageBox.No)
+        if answer == QtWidgets.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+        super().closeEvent(event)
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    w = Form()
+    w.show()
     sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()
