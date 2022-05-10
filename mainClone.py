@@ -9,7 +9,7 @@ import os
 from ColorTransferWindow import Ui_ColorTransfer_Form
 from EnhanceWindow import Ui_EnhanceForm
 from FilterWindow import Ui_FilterDialog
-from MainWindow import Ui_MainWindow
+from MainCloneWindow import Ui_MainWindow
 from AddTextGUI import Ui_Form
 from RotateWindow import Ui_Dialog
 
@@ -21,18 +21,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.originQPoint = None
         self.setupUi(self)
         # khai bao nut start
-        self.openBtn.clicked.connect(self.showScreen)
-        self.pushButton_2.clicked.connect(self.saveImage)
-        self.pushButton_3.clicked.connect(self.addText)
-        self.pushButton_4.clicked.connect(self.enhanceEvent)
-        self.pushButton_5.clicked.connect(self.clearImage)
-        self.pushButton.clicked.connect(self.colorTransfer)
-        self.pushButton_6.clicked.connect(self.testcrop)
-        self.pushButton_10.clicked.connect(self.rotateEvent)
-        self.pushButton_11.clicked.connect(self.FilterEvent)
-        self.pushButton_7.clicked.connect(self.history)
+        self.actionOpen.triggered.connect(self.showScreen)
+        self.actionSave_as.triggered.connect(self.saveImage)
+        self.actionDraw_Text.triggered.connect(self.addText)
+        self.actionEnhance.triggered.connect(self.enhanceEvent)
+        self.actionClear.triggered.connect(self.clearImage)
+        self.actionColor_Transforms.triggered.connect(self.colorTransfer)
+        self.actionCrop.triggered.connect(self.testcrop)
+        self.actionRotate.triggered.connect(self.rotateEvent)
+        self.actionFilter.triggered.connect(self.FilterEvent)
+        # self.clicked.connect(self.history)
         # self.uic.pushButton_4.clicked.connect(self.Open_SubScreen)
-        self.fname = None
+        self.fname = ''
         self.original_pixmap = None
         # Mo Man hinh phu
         self.uic1 = Ui_Form()
@@ -58,9 +58,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.imgScreen.mouseReleaseEvent = self.cropEvent3
         self.listPixMap = []
 
+        self.labelwidth = 0
+        self.labelheigh = 0
+
     def cropEvent1(self, eventQMouseEvent):
         if self.isCrop:
-            if self.fname is None:
+            if self.fname == '':
                 pass
             else:
                 self.originQPoint = eventQMouseEvent.pos()
@@ -70,18 +73,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def cropEvent2(self, eventQMouseEvent):
         text = "x: {0},  y: {1}".format(eventQMouseEvent.x(), eventQMouseEvent.y())
-        self.label.setText(text)
-        self.label.adjustSize()
+        self.actionlabel.setText(text)
 
         if self.isCrop:
-            if self.fname is None:
+            if self.fname == '':
                 pass
             else:
                 self.currentQRubberBand.setGeometry(QRect(self.originQPoint, eventQMouseEvent.pos()).normalized())
 
     def cropEvent3(self, eventQMouseEvent):
         if self.isCrop:
-            if self.fname is None:
+            if self.fname == '':
                 pass
             else:
                 self.currentQRubberBand.hide()
@@ -90,14 +92,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 cropQPixmap = self.imgScreen.pixmap().copy(currentQRect)
 
                 myImage = ImageQt.fromqpixmap(cropQPixmap)
-                label_w = self.imgScreen.width()
-                label_h = self.imgScreen.height()
 
-                myImage = myImage.resize((label_w, label_h))
                 im = myImage.convert("RGBA")
                 pixmap = ImageQt.toqpixmap(im)
                 self.imgScreen.setPixmap(pixmap)
-                self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
                 self.currentPixmap = pixmap
                 self.isCrop = False
 
@@ -116,11 +114,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def showScreen(self):
         # Open file dialog
+        if self.labelwidth == 0:
+            self.labelwidth = self.imgScreen.width()
+        if self.labelheigh == 0:
+            self.labelheigh = self.imgScreen.height()
+        self.imgScreen.setFixedSize(self.labelwidth, self.labelheigh)
         self.fname, _ = QFileDialog.getOpenFileName(self, "Open File", "",
                                                     "All Files (*);;Image Files *.jpg; *.jpeg;")
 
         # Hien thi anh trong label
-        if self.fname is not None:
+        if self.fname != '':
             image = Image.open(self.fname)
             im = image.convert("RGBA")
 
@@ -129,16 +132,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             label_h = self.imgScreen.height()
             if im.width >= label_w or im.height >= label_h:
                 im = im.resize((label_w, label_h))
-                pixmap = ImageQt.toqpixmap(im)
-                self.imgScreen.setPixmap(pixmap)
-                self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
-                self.original_pixmap = pixmap
-                self.currentPixmap = pixmap
             else:
-                QMessageBox.about(self.centralwidget, "Error", f"To use the app perfectly, "
-                                                               "your image size should be more {w}x{h}".format(
-                    w=label_w,
-                    h=label_h))
+                pass
+            pixmap = ImageQt.toqpixmap(im)
+            self.imgScreen.setPixmap(pixmap)
+            self.imgScreen.setFixedSize(im.width, im.height)
+            self.original_pixmap = pixmap
+            self.currentPixmap = pixmap
+        else:
+            pass
 
     def handleButton(self):
         modifiers = QApplication.keyboardModifiers()
@@ -174,7 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.uic1.txtY.valueChanged.connect(self.changePositionOther)
         self.uic1.btnUndo.clicked.connect(self.clearImage)
 
-        if self.fname is not None:
+        if self.fname != '':
             myImage = Image.open(str(self.fname))
 
             self.uic1.max_X.setText("Max X: " + str(myImage.width))
@@ -183,7 +185,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def drawText(self):
         myText = self.uic1.textEdit.toPlainText()
 
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 myImage = Image.open(str(self.fname))
             else:
@@ -197,7 +199,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             im = myImage.convert("RGBA")
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -274,7 +275,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
 
     def enhanceEvent(self):
@@ -289,7 +289,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def brightnessChange(self):
         value = self.uic2.brightnessSlide.value() / 10
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -299,7 +299,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             im = enhanced.convert("RGBA")
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -307,7 +306,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def sharpnessChange(self):
         value = self.uic2.sharpnessSlide.value() / 10
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -319,7 +318,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pixmap = ImageQt.toqpixmap(im)
 
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -327,7 +325,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def colorChange(self):
         value = self.uic2.colorSlide.value() / 10
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -338,7 +336,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             im = enhanced.convert("RGBA")
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -346,7 +343,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def contrastChange(self):
         value = self.uic2.contrastSlide.value() / 10
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -358,7 +355,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pixmap = ImageQt.toqpixmap(im)
 
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -387,7 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.uic3.pushButton_6.clicked.connect(self.eventColorTransfer)
 
     def eventColorTransfer(self):
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 myImage = Image.open(str(self.fname))
             else:
@@ -416,7 +412,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 im = temp_image.convert("RGBA")
                 pixmap = ImageQt.toqpixmap(im)
                 self.imgScreen.setPixmap(pixmap)
-                self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
                 self.currentPixmap = pixmap
                 self.listPixMap.append(pixmap)
             else:
@@ -436,7 +431,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.uic4.pushButton_4.clicked.connect(self.clearImage)
 
     def flipEvent(self):
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -454,7 +449,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             im = image_flip.convert("RGBA")
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
         else:
@@ -462,7 +456,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def rotateImage(self):
         value = self.uic4.spinBox.value()
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 im = Image.open(self.fname)
             else:
@@ -472,7 +466,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             im = image_rotate.convert("RGBA")
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
-            self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
             self.currentPixmap = pixmap
             self.listPixMap.append(pixmap)
             self.uic4.spinBox.setValue(0)
@@ -494,7 +487,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.uic5.pushButton_8.clicked.connect(self.eventfilter)
 
     def eventfilter(self):
-        if self.fname is not None:
+        if self.fname != '':
             if self.currentPixmap is None:
                 myImage = Image.open(str(self.fname))
             else:
@@ -522,7 +515,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 im = temp_image.convert("RGBA")
                 pixmap = ImageQt.toqpixmap(im)
                 self.imgScreen.setPixmap(pixmap)
-                self.imgScreen.setFixedSize(self.imgScreen.width(), self.imgScreen.height())
                 self.currentPixmap = pixmap
                 self.listPixMap.append(pixmap)
             else:
@@ -531,6 +523,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def history(self):
         for item in self.listPixMap:
             print(item)
+
+    def checkDialog(self):
+        pass
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_win = MainWindow()
