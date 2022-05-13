@@ -26,6 +26,11 @@ class Ui_MainWindow(object):
         right_spacer = QWidget()
         right_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -87,6 +92,10 @@ class Ui_MainWindow(object):
         self.actionlabel = QtWidgets.QAction(MainWindow)
         self.actionlabel.setText("")
         self.actionlabel.setObjectName("actionlabel")
+        self.actionResize = QtWidgets.QAction(MainWindow)
+        self.actionResize.setObjectName("actionResize")
+        self.actionHistory = QtWidgets.QAction(MainWindow)
+        self.actionHistory.setObjectName("actionHistory")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave_as)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -97,10 +106,11 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionRotate)
         self.toolBar.addAction(self.actionFilter)
         self.toolBar.addAction(self.actionCrop)
+        self.toolBar.addAction(self.actionResize)
+        self.toolBar.addAction(self.actionHistory)
         self.toolBar.addAction(self.actionClear)
-        self.toolBar.addWidget(right_spacer)
         self.toolBar_2.addAction(self.actionlabel)
-
+        self.toolBar.addWidget(right_spacer)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -119,5 +129,7 @@ class Ui_MainWindow(object):
         self.actionFilter.setText(_translate("MainWindow", "Filter"))
         self.actionCrop.setText(_translate("MainWindow", "Crop"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
+        self.actionResize.setText(_translate("MainWindow", "Resize"))
+        self.actionHistory.setText(_translate("MainWindow", "History"))
         MainWindow.showMaximized()
 
