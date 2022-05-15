@@ -1,10 +1,12 @@
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QFileDialog, QRubberBand, QColorDialog, QMessageBox
-from PyQt5.QtCore import Qt, QPoint, QRect, QObject, pyqtSignal, pyqtSlot, QEvent, QSize
-from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor, QImage
+from PyQt5.QtCore import Qt, QPoint, QRect, QObject, pyqtSignal, pyqtSlot, QEvent, QSize, Qt
+from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor, QImage, QIcon
 from PIL import Image, ImageFont, ImageDraw, ImageQt, ImageColor, ImageFilter, ImageEnhance, ImageQt
 import os
+
+from regex import R
 
 from ColorTransferWindow import Ui_ColorTransfer_Form
 from EnhanceWindow import Ui_EnhanceForm
@@ -12,7 +14,8 @@ from FilterWindow import Ui_FilterDialog
 from MainCloneWindow import Ui_MainWindow
 from AddTextGUI import Ui_Form
 from RotateWindow import Ui_Dialog
-
+from HistoryWindow import Ui_HistoryDialog
+from ResizeWindow import Ui_ResizeDialog
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -30,7 +33,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionCrop.triggered.connect(self.testcrop)
         self.actionRotate.triggered.connect(self.rotateEvent)
         self.actionFilter.triggered.connect(self.FilterEvent)
-        # self.clicked.connect(self.history)
+        self.actionHistory.triggered.connect(self.history)
+        self.actionResize.triggered.connect(self.resizeImage)
         # self.uic.pushButton_4.clicked.connect(self.Open_SubScreen)
         self.fname = ''
         self.original_pixmap = None
@@ -45,6 +49,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Fifth_window = QtWidgets.QDialog()
         self.uic5 = Ui_FilterDialog()
         self.Sixth_window = QtWidgets.QDialog()
+        self.uic6 = Ui_HistoryDialog()
+        self.Seventh_window = QtWidgets.QDialog()
+        self.uic7 = Ui_ResizeDialog()
+        self.Eighth_window = QtWidgets.QDialog()
         # Set vi tri
         self.width_img = 0
         self.heigh_img = 0
@@ -521,9 +529,58 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 pass
 
     def history(self):
-        for item in self.listPixMap:
-            print(item)
+        if self.fname != '':
+            self.Seventh_window = QtWidgets.QDialog()
+            self.uic6.setupUi(self.Seventh_window)
+            self.Seventh_window.show()
 
+            for item in reversed(self.listPixMap):
+                imageItem = QtWidgets.QListWidgetItem(QIcon(item), os.path.basename(self.fname))
+                self.uic6.listWidget.addItem(imageItem)
+            self.uic6.pushButton.clicked.connect(self.deleteHistoryEvent)
+            self.uic6.pushButton_2.clicked.connect(self.applyHistoryEvent)
+            self.uic6.listWidget.itemClicked.connect(self.historySelectionEvent)
+            #self.uic6.closeEvent.itemClicked.connect(self.applyHistoryEvent)
+
+    def applyHistoryEvent(self):
+        pass
+
+    def historySelectionEvent(self, item):
+        label_w = self.imgScreen.width()
+        label_h = self.imgScreen.height()
+        icon = item.icon()
+        self.imgScreen.setPixmap(icon.pixmap(icon.actualSize(QSize(label_w, label_h))))
+
+    def deleteHistoryEvent(self):
+        label_w = self.imgScreen.width()
+        label_h = self.imgScreen.height()
+        defaultSize = QSize(label_w, label_h)
+        listWidget = self.uic6.listWidget
+        listItems = listWidget.selectedItems()
+
+        if not listItems: return
+        for item in listItems:
+            listWidget.takeItem(listWidget.row(item))
+            self.listPixMap.pop(listWidget.row(item))
+
+        if not listWidget:
+            self.clearImage()
+        else: 
+            icon = listWidget.item(0).icon()
+            self.imgScreen.setPixmap(icon.pixmap(icon.actualSize(defaultSize)))
+
+    def resizeImage(self):
+        if self.fname != '':
+            self.Eighth_window = QtWidgets.QDialog()
+            self.uic7.setupUi(self.Eighth_window)
+            self.Eighth_window.show()
+            self.uic7.pushButton.clicked.connect(self.resizeImageEvent)
+            
+    def resizeImageEvent(self):
+        pixmap = self.currentPixmap.scaled(self.uic7.sbWidth.value(), self.uic7.sbHeight.value(), Qt.KeepAspectRatio)
+        self.imgScreen.setPixmap(pixmap)
+        self.listPixMap.append(pixmap)
+        
     def checkDialog(self):
         pass
 

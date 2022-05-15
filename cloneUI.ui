@@ -94,6 +94,8 @@
    <addaction name="actionRotate"/>
    <addaction name="actionFilter"/>
    <addaction name="actionCrop"/>
+   <addaction name="actionResize"/>
+   <addaction name="actionHistory"/>
    <addaction name="actionClear"/>
   </widget>
   <widget class="QToolBar" name="toolBar_2">
@@ -156,6 +158,16 @@
   <action name="actionlabel">
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="actionResize">
+   <property name="text">
+    <string>Resize</string>
+   </property>
+  </action>
+  <action name="actionHistory">
+   <property name="text">
+    <string>History</string>
    </property>
   </action>
  </widget>
