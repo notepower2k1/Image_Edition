@@ -17,6 +17,7 @@ from RotateWindow import Ui_Dialog
 from HistoryWindow import Ui_HistoryDialog
 from ResizeWindow import Ui_ResizeDialog
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -129,7 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.imgScreen.setFixedSize(self.labelwidth, self.labelheigh)
         self.fname, _ = QFileDialog.getOpenFileName(self, "Open File", "",
                                                     "All Files (*);;Image Files *.jpg; *.jpeg;")
-
+        self.listPixMap.clear()
         # Hien thi anh trong label
         if self.fname != '':
             image = Image.open(self.fname)
@@ -162,33 +163,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print('Mouse Click')
 
     def addText(self):
-        # Mo cua so Add Text
-        self.Second_window = QtWidgets.QDialog()
-        self.uic1.setupUi(self.Second_window)
-        self.Second_window.show()
-
-        # Event click cua so color picker
-        self.uic1.displayColorWidget.mouseReleaseEvent = lambda event: self.addColor()
-
-        self.uic1.drawBtn.clicked.connect(self.drawText)
-        self.uic1.textEdit.textChanged.connect(self.changeColor)
-        # Kiem tra radio button
-        self.uic1.btnCenter.clicked.connect(self.check)
-        self.uic1.btnT_L.clicked.connect(self.check)
-        self.uic1.btnT_R.clicked.connect(self.check)
-        self.uic1.btnB_L.clicked.connect(self.check)
-        self.uic1.btnB_R.clicked.connect(self.check)
-        self.uic1.btnOther.clicked.connect(self.check)
-        self.uic1.fontsizeSpinBox.valueChanged.connect(self.changefontSize)
-        self.uic1.txtX.valueChanged.connect(self.changePositionOther)
-        self.uic1.txtY.valueChanged.connect(self.changePositionOther)
-        self.uic1.btnUndo.clicked.connect(self.clearImage)
-
         if self.fname != '':
-            myImage = Image.open(str(self.fname))
+            # Mo cua so Add Text
+            self.Second_window = QtWidgets.QDialog()
+            self.uic1.setupUi(self.Second_window)
+            self.Second_window.show()
 
-            self.uic1.max_X.setText("Max X: " + str(myImage.width))
-            self.uic1.max_Y.setText("Max Y: " + str(myImage.height))
+            # Event click cua so color picker
+            self.uic1.displayColorWidget.mouseReleaseEvent = lambda event: self.addColor()
+
+            self.uic1.drawBtn.clicked.connect(self.drawText)
+            self.uic1.textEdit.textChanged.connect(self.changeColor)
+            # Kiem tra radio button
+            self.uic1.btnCenter.clicked.connect(self.check)
+            self.uic1.btnT_L.clicked.connect(self.check)
+            self.uic1.btnT_R.clicked.connect(self.check)
+            self.uic1.btnB_L.clicked.connect(self.check)
+            self.uic1.btnB_R.clicked.connect(self.check)
+            self.uic1.btnOther.clicked.connect(self.check)
+            self.uic1.fontsizeSpinBox.valueChanged.connect(self.changefontSize)
+            self.uic1.txtX.valueChanged.connect(self.check)
+            self.uic1.txtY.valueChanged.connect(self.check)
+            self.uic1.btnUndo.clicked.connect(self.undo)
+
+            if self.fname != '':
+                myImage = Image.open(str(self.fname))
+
+                self.uic1.max_X.setText("Max X: " + str(myImage.width))
+                self.uic1.max_Y.setText("Max Y: " + str(myImage.height))
 
     def drawText(self):
         myText = self.uic1.textEdit.toPlainText()
@@ -234,31 +236,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.uic1.textEdit.setTextColor(QColor(red, green, blue))
 
     def check(self):
-        image = Image.open(self.fname)
+        w = self.imgScreen.width()
+        h = self.imgScreen.height()
 
-        w = 0
-        h = 0
         if self.uic1.btnCenter.isChecked():
-            w = image.width / 2
-            h = image.height / 2
-        elif self.uic1.btnT_L.isChecked():
-            w = 0
-            h = 0
-        elif self.uic1.btnT_R.isChecked():
-            w = image.width - self.font_size * 2
-            h = 0
-        elif self.uic1.btnB_L.isChecked():
-            w = 0
-            h = image.height - self.font_size * 2
-        elif self.uic1.btnB_R.isChecked():
-            w = image.width - self.font_size * 2
-            h = image.height - self.font_size * 2
-        elif self.uic1.btnOther.isChecked():
+            self.width_img = w / 2
+            self.heigh_img = h / 2
+        if self.uic1.btnT_L.isChecked():
+            self.width_img = 0
+            self.heigh_img = 0
+        if self.uic1.btnT_R.isChecked():
+            self.width_img = w - self.font_size * 2
+            self.heigh_img = 0
+        if self.uic1.btnB_L.isChecked():
+            self.width_img = 0
+            self.heigh_img = h - self.font_size * 2
+        if self.uic1.btnB_R.isChecked():
+            self.width_img = w - self.font_size * 2
+            self.heigh_img = h - self.font_size * 2
+        if self.uic1.btnOther.isChecked():
+            self.width_img = self.uic1.txtX.value()
+            self.heigh_img = self.uic1.txtY.value()
+        else:
             pass
-
-        self.width_img = w
-        self.heigh_img = h
-
         # changing text of label
 
     def changefontSize(self):
@@ -284,16 +284,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pixmap = ImageQt.toqpixmap(im)
             self.imgScreen.setPixmap(pixmap)
             self.currentPixmap = pixmap
+            self.listPixMap.clear()
 
     def enhanceEvent(self):
-        self.Third_window = QtWidgets.QDialog()
-        self.uic2.setupUi(self.Third_window)
-        self.Third_window.show()
+        if self.fname != '':
+            self.Third_window = QtWidgets.QDialog()
+            self.uic2.setupUi(self.Third_window)
+            self.Third_window.show()
 
-        self.uic2.brightnessSlide.sliderReleased.connect(self.brightnessChange)
-        self.uic2.sharpnessSlide.sliderReleased.connect(self.sharpnessChange)
-        self.uic2.colorSlide.sliderReleased.connect(self.colorChange)
-        self.uic2.contrastSlide.sliderReleased.connect(self.contrastChange)
+            self.uic2.brightnessSlide.sliderReleased.connect(self.brightnessChange)
+            self.uic2.sharpnessSlide.sliderReleased.connect(self.sharpnessChange)
+            self.uic2.colorSlide.sliderReleased.connect(self.colorChange)
+            self.uic2.contrastSlide.sliderReleased.connect(self.contrastChange)
 
     def brightnessChange(self):
         value = self.uic2.brightnessSlide.value() / 10
@@ -379,16 +381,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 os.mkdir(image_path)
 
     def colorTransfer(self):
-        self.Fourth_window = QtWidgets.QDialog()
-        self.uic3.setupUi(self.Fourth_window)
-        self.Fourth_window.show()
+        if self.fname != '':
+            self.Fourth_window = QtWidgets.QDialog()
+            self.uic3.setupUi(self.Fourth_window)
+            self.Fourth_window.show()
 
-        self.uic3.pushButton.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_2.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_3.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_4.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_5.clicked.connect(self.eventColorTransfer)
-        self.uic3.pushButton_6.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton_2.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton_3.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton_4.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton_5.clicked.connect(self.eventColorTransfer)
+            self.uic3.pushButton_6.clicked.connect(self.eventColorTransfer)
 
     def eventColorTransfer(self):
         if self.fname != '':
@@ -412,7 +415,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif btn == self.uic3.pushButton_5:
                 temp_image = Image.merge("RGB", (blue, red, green))
             elif btn == self.uic3.pushButton_6:
-                self.clearImage()
+                self.undo()
             else:
                 pass
 
@@ -422,6 +425,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imgScreen.setPixmap(pixmap)
                 self.currentPixmap = pixmap
                 self.listPixMap.append(pixmap)
+
+                print(pixmap)
             else:
                 pass
 
@@ -429,14 +434,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.isCrop = True
 
     def rotateEvent(self):
-        self.Fifth_window = QtWidgets.QDialog()
-        self.uic4.setupUi(self.Fifth_window)
-        self.Fifth_window.show()
+        if self.fname != '':
+            self.Fifth_window = QtWidgets.QDialog()
+            self.uic4.setupUi(self.Fifth_window)
+            self.Fifth_window.show()
 
-        self.uic4.pushButton.clicked.connect(self.flipEvent)
-        self.uic4.pushButton_2.clicked.connect(self.flipEvent)
-        self.uic4.pushButton_3.clicked.connect(self.rotateImage)
-        self.uic4.pushButton_4.clicked.connect(self.clearImage)
+            self.uic4.pushButton.clicked.connect(self.flipEvent)
+            self.uic4.pushButton_2.clicked.connect(self.flipEvent)
+            self.uic4.pushButton_3.clicked.connect(self.rotateImage)
+            self.uic4.pushButton_4.clicked.connect(self.undo)
 
     def flipEvent(self):
         if self.fname != '':
@@ -482,17 +488,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def FilterEvent(self):
-        self.Sixth_window = QtWidgets.QDialog()
-        self.uic5.setupUi(self.Sixth_window)
-        self.Sixth_window.show()
+        if self.fname != '':
+            self.Sixth_window = QtWidgets.QDialog()
+            self.uic5.setupUi(self.Sixth_window)
+            self.Sixth_window.show()
 
-        self.uic5.pushButton.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_2.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_3.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_4.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_5.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_7.clicked.connect(self.eventfilter)
-        self.uic5.pushButton_8.clicked.connect(self.eventfilter)
+            self.uic5.pushButton.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_2.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_3.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_4.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_5.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_7.clicked.connect(self.eventfilter)
+            self.uic5.pushButton_8.clicked.connect(self.eventfilter)
 
     def eventfilter(self):
         if self.fname != '':
@@ -517,7 +524,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif btn == self.uic5.pushButton_8:
                 temp_image = myImage.filter(ImageFilter.SMOOTH)
             else:
-                pass
+                self.undo()
 
             if temp_image is not None:
                 im = temp_image.convert("RGBA")
@@ -540,7 +547,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uic6.pushButton.clicked.connect(self.deleteHistoryEvent)
             self.uic6.pushButton_2.clicked.connect(self.applyHistoryEvent)
             self.uic6.listWidget.itemClicked.connect(self.historySelectionEvent)
-            #self.uic6.closeEvent.itemClicked.connect(self.applyHistoryEvent)
+            # self.uic6.closeEvent.itemClicked.connect(self.applyHistoryEvent)
 
     def applyHistoryEvent(self):
         pass
@@ -565,7 +572,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if not listWidget:
             self.clearImage()
-        else: 
+        else:
             icon = listWidget.item(0).icon()
             self.imgScreen.setPixmap(icon.pixmap(icon.actualSize(defaultSize)))
 
@@ -575,14 +582,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uic7.setupUi(self.Eighth_window)
             self.Eighth_window.show()
             self.uic7.pushButton.clicked.connect(self.resizeImageEvent)
-            
+            self.uic7.pushButton_2.clicked.connect(self.undo)
     def resizeImageEvent(self):
         pixmap = self.currentPixmap.scaled(self.uic7.sbWidth.value(), self.uic7.sbHeight.value(), Qt.KeepAspectRatio)
         self.imgScreen.setPixmap(pixmap)
         self.listPixMap.append(pixmap)
-        
+
     def checkDialog(self):
         pass
+
+    def undo(self):
+        if self.fname != '':
+            if len(self.listPixMap) <= 1:
+                self.clearImage()
+            else:
+                pixmap = self.listPixMap[(self.listPixMap.index(self.currentPixmap)) - 1]
+                self.listPixMap.pop()
+                self.imgScreen.setPixmap(pixmap)
+                self.currentPixmap = pixmap
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
