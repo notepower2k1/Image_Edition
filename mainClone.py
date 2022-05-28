@@ -136,13 +136,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if answer == QtWidgets.QMessageBox.Yes:
             event.accept()
             items = vars(self)
-
             # Closing all Dialog when close app
             self.runCloseDialogs()
+            super().closeEvent(event)
         else:
             event.ignore()
-        super().closeEvent(event)
-
+        
     def showScreen(self):
         # Open file dialog
         if self.labelwidth == 0:
@@ -560,39 +559,82 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def history(self):
         if self.fname != '':
+            # Mở history dialog
             self.Seventh_window = QtWidgets.QDialog()
             self.uic6.setupUi(self.Seventh_window)
             self.Seventh_window.show()
-
+            # Thêm các pixmap vào qlistwidget của history dialog
             for item in reversed(self.listPixMap):
                 imageItem = QtWidgets.QListWidgetItem(QIcon(item), os.path.basename(self.fname))
                 self.uic6.listWidget.addItem(imageItem)
+            # Các event (apply, delete các pixmap trong history)
             self.uic6.pushButton.clicked.connect(self.deleteHistoryEvent)
             self.uic6.pushButton_2.clicked.connect(self.applyHistoryEvent)
+            # event click chọn các pixmap trong qlistwidget
             self.uic6.listWidget.itemClicked.connect(self.historySelectionEvent)
-            # self.uic6.closeEvent.itemClicked.connect(self.applyHistoryEvent)
+            # Thêm apply event close cho qdialog history
+            self.Seventh_window.closeEvent = self.historyCloseEvent
 
+    def historyCloseEvent(self, event):
+        if self.listPixMap:
+            answer = QtWidgets.QMessageBox.question(
+                self,
+                'Notify! ',
+                'Are you sure you want to apply this history ?',
+                QtWidgets.QMessageBox.No,
+                QtWidgets.QMessageBox.Apply)
+            if answer == QtWidgets.QMessageBox.Apply:
+                super().closeEvent(event)
+            else:
+                self.imgScreen.setPixmap(self.listPixMap[-1])
+                self.currentPixmap = self.listPixMap[-1]
+                super().closeEvent(event)
+        
     def applyHistoryEvent(self):
-        pass
+        if self.listPixMap:
+            answer = QtWidgets.QMessageBox.question(
+                self,
+                'Notify!',
+                'Are you sure you want to apply this history ?',
+                QtWidgets.QMessageBox.No,
+                QtWidgets.QMessageBox.Apply)
+            if answer == QtWidgets.QMessageBox.Apply:
+                # Đóng cửa sổ qdialog
+                self.Seventh_window.accept()
+            else:
+                # Đóng cửa sổ qdialog và hoàn tác
+                self.imgScreen.setPixmap(self.listPixMap[-1])
+                self.currentPixmap = self.listPixMap[-1]
+                self.Seventh_window.accept()
+            pass
+        else: self.Seventh_window.accept()
 
     def historySelectionEvent(self, item):
+        # Lấy giá trị width height của ảnh default
         label_w = self.imgScreen.width()
         label_h = self.imgScreen.height()
+        # Get icon (ảnh) của các pixmap
         icon = item.icon()
+        # Set màn hình hiện tại bằng icon vừa get được
         self.imgScreen.setPixmap(icon.pixmap(icon.actualSize(QSize(label_w, label_h))))
 
     def deleteHistoryEvent(self):
+        # Lấy giá trị default của ảnh và ảnh đang select trong qlistwidget
         label_w = self.imgScreen.width()
         label_h = self.imgScreen.height()
         defaultSize = QSize(label_w, label_h)
         listWidget = self.uic6.listWidget
         listItems = listWidget.selectedItems()
 
+        # Không làm gì và tắt nếu list không có gì
         if not listItems: return
+
+        # Xóa item trong qlistwidget và listpixmap hiện tại
         for item in listItems:
             listWidget.takeItem(listWidget.row(item))
             self.listPixMap.pop(listWidget.row(item))
 
+        # Điều chỉnh ảnh đang show theo qlistwidget và listpixmap hiện tại
         if not listWidget:
             self.clearImage()
         else:
@@ -601,14 +643,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def resizeImage(self):
         if self.fname != '':
+            # Mở resize dialog
             self.runCloseDialogs()
             self.Eighth_window = QtWidgets.QDialog()
             self.uic7.setupUi(self.Eighth_window)
             self.Eighth_window.show()
+            # Các event
             self.uic7.pushButton.clicked.connect(self.resizeImageEvent)
             self.uic7.pushButton_2.clicked.connect(self.undo)
 
     def resizeImageEvent(self):
+        # Điều chỉnh pixmap hiện tại theo scale lấy được từ 2 input width height
         pixmap = self.currentPixmap.scaled(self.uic7.sbWidth.value(), self.uic7.sbHeight.value(), Qt.KeepAspectRatio)
         self.imgScreen.setPixmap(pixmap)
         self.listPixMap.append(pixmap)
