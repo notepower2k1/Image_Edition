@@ -131,5 +131,5 @@ class Ui_MainWindow(object):
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionResize.setText(_translate("MainWindow", "Resize"))
         self.actionHistory.setText(_translate("MainWindow", "History"))
-        MainWindow.showMaximized()
 
+        MainWindow.showMaximized()

@@ -21,6 +21,8 @@ from ResizeWindow import Ui_ResizeDialog
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.x = 0
+        self.y = 0
         self.currentQRubberBand = None
         self.originQPoint = None
         self.setupUi(self)
@@ -70,24 +72,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.labelwidth = 0
         self.labelheigh = 0
 
+        text = "x: 0,  y: 0"
+        self.actionlabel.setText(text)
+
+    # Crop Event
     def cropEvent1(self, eventQMouseEvent):
         if self.isCrop:
             if self.fname == '':
                 pass
             else:
+                # Create Crop Point Start
                 self.originQPoint = eventQMouseEvent.pos()
                 self.currentQRubberBand = QRubberBand(QRubberBand.Rectangle, self.imgScreen)
                 self.currentQRubberBand.setGeometry(QRect(self.originQPoint, QSize()))
                 self.currentQRubberBand.show()
 
     def cropEvent2(self, eventQMouseEvent):
+
+        # Set some value postion
         text = "x: {0},  y: {1}".format(eventQMouseEvent.x(), eventQMouseEvent.y())
         self.actionlabel.setText(text)
+
+        self.x = eventQMouseEvent.x()
+        self.y = eventQMouseEvent.y()
+
+        if self.Second_window.isVisible():
+            self.uic1.txtX.setValue(self.x)
+            self.uic1.txtY.setValue(self.y)
 
         if self.isCrop:
             if self.fname == '':
                 pass
             else:
+                # Expanded crop Rectangle with eventQmouse
                 self.currentQRubberBand.setGeometry(QRect(self.originQPoint, eventQMouseEvent.pos()).normalized())
 
     def cropEvent3(self, eventQMouseEvent):
@@ -95,6 +112,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.fname == '':
                 pass
             else:
+                # Crop Image With Rectangle
                 self.currentQRubberBand.hide()
                 currentQRect = self.currentQRubberBand.geometry()
                 self.currentQRubberBand.deleteLater()
@@ -117,6 +135,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QtWidgets.QMessageBox.No)
         if answer == QtWidgets.QMessageBox.Yes:
             event.accept()
+            items = vars(self)
+
+            # Closing all Dialog when close app
+            self.runCloseDialogs()
         else:
             event.ignore()
         super().closeEvent(event)
@@ -164,6 +186,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def addText(self):
         if self.fname != '':
+            self.runCloseDialogs()
             # Mo cua so Add Text
             self.Second_window = QtWidgets.QDialog()
             self.uic1.setupUi(self.Second_window)
@@ -259,14 +282,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.heigh_img = self.uic1.txtY.value()
         else:
             pass
-        # changing text of label
 
     def changefontSize(self):
         self.font_size = self.uic1.fontsizeSpinBox.value()
-
-    def changePositionOther(self):
-        self.width_img = self.uic1.txtX.value()
-        self.heigh_img = self.uic1.txtY.value()
 
     def clearImage(self):
         if self.original_pixmap:
@@ -288,6 +306,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def enhanceEvent(self):
         if self.fname != '':
+            self.runCloseDialogs()
             self.Third_window = QtWidgets.QDialog()
             self.uic2.setupUi(self.Third_window)
             self.Third_window.show()
@@ -371,17 +390,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
 
     def saveImage(self):
-        if self.fname:
-            image_path = "/image"
-            if os.path.exists(image_path):
-                ImageName = self.fname.split("/")
-                myImage = Image.open(str(self.fname))
-                myImage.save(f"{image_path}/" + ImageName[-1], 'JPEG')
-            else:
-                os.mkdir(image_path)
+        file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if file != '':
+            if self.fname != '':
+                if self.currentPixmap is None:
+                    im = Image.open(self.fname)
+                    im.save(f"{file}/photo.jpg")
+                else:
+                    im = ImageQt.fromqpixmap(self.currentPixmap)
+                    im.save(f"{file}/photo.jpg")
+        else:
+            pass
 
     def colorTransfer(self):
         if self.fname != '':
+            self.runCloseDialogs()
             self.Fourth_window = QtWidgets.QDialog()
             self.uic3.setupUi(self.Fourth_window)
             self.Fourth_window.show()
@@ -425,8 +448,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imgScreen.setPixmap(pixmap)
                 self.currentPixmap = pixmap
                 self.listPixMap.append(pixmap)
-
-                print(pixmap)
             else:
                 pass
 
@@ -435,6 +456,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def rotateEvent(self):
         if self.fname != '':
+            self.runCloseDialogs()
             self.Fifth_window = QtWidgets.QDialog()
             self.uic4.setupUi(self.Fifth_window)
             self.Fifth_window.show()
@@ -489,6 +511,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def FilterEvent(self):
         if self.fname != '':
+            self.runCloseDialogs()
             self.Sixth_window = QtWidgets.QDialog()
             self.uic5.setupUi(self.Sixth_window)
             self.Sixth_window.show()
@@ -578,11 +601,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def resizeImage(self):
         if self.fname != '':
+            self.runCloseDialogs()
             self.Eighth_window = QtWidgets.QDialog()
             self.uic7.setupUi(self.Eighth_window)
             self.Eighth_window.show()
             self.uic7.pushButton.clicked.connect(self.resizeImageEvent)
             self.uic7.pushButton_2.clicked.connect(self.undo)
+
     def resizeImageEvent(self):
         pixmap = self.currentPixmap.scaled(self.uic7.sbWidth.value(), self.uic7.sbHeight.value(), Qt.KeepAspectRatio)
         self.imgScreen.setPixmap(pixmap)
@@ -601,6 +626,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imgScreen.setPixmap(pixmap)
                 self.currentPixmap = pixmap
 
+    def runCloseDialogs(self):
+
+        items = vars(self)
+
+        for i in items:
+            item = items[i]
+            if isinstance(item, QtWidgets.QDialog) and item.isVisible():
+                item.setVisible(False)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
