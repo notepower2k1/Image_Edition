@@ -38,6 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionFilter.triggered.connect(self.FilterEvent)
         self.actionHistory.triggered.connect(self.history)
         self.actionResize.triggered.connect(self.resizeImage)
+        self.actionUndo.triggered.connect(self.undo)
         # self.uic.pushButton_4.clicked.connect(self.Open_SubScreen)
         self.fname = ''
         self.original_pixmap = None
@@ -125,6 +126,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imgScreen.setPixmap(pixmap)
                 self.currentPixmap = pixmap
                 self.isCrop = False
+                self.listPixMap.append(pixmap)
 
     def closeEvent(self, event):
         answer = QtWidgets.QMessageBox.question(
@@ -141,7 +143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             super().closeEvent(event)
         else:
             event.ignore()
-        
+
     def showScreen(self):
         # Open file dialog
         if self.labelwidth == 0:
@@ -206,7 +208,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uic1.fontsizeSpinBox.valueChanged.connect(self.changefontSize)
             self.uic1.txtX.valueChanged.connect(self.check)
             self.uic1.txtY.valueChanged.connect(self.check)
-            self.uic1.btnUndo.clicked.connect(self.undo)
 
             if self.fname != '':
                 myImage = Image.open(str(self.fname))
@@ -413,7 +414,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uic3.pushButton_3.clicked.connect(self.eventColorTransfer)
             self.uic3.pushButton_4.clicked.connect(self.eventColorTransfer)
             self.uic3.pushButton_5.clicked.connect(self.eventColorTransfer)
-            self.uic3.pushButton_6.clicked.connect(self.eventColorTransfer)
 
     def eventColorTransfer(self):
         if self.fname != '':
@@ -436,8 +436,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 temp_image = Image.merge("RGB", (red, blue, green))
             elif btn == self.uic3.pushButton_5:
                 temp_image = Image.merge("RGB", (blue, red, green))
-            elif btn == self.uic3.pushButton_6:
-                self.undo()
             else:
                 pass
 
@@ -463,7 +461,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.uic4.pushButton.clicked.connect(self.flipEvent)
             self.uic4.pushButton_2.clicked.connect(self.flipEvent)
             self.uic4.pushButton_3.clicked.connect(self.rotateImage)
-            self.uic4.pushButton_4.clicked.connect(self.undo)
 
     def flipEvent(self):
         if self.fname != '':
@@ -505,9 +502,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.listPixMap.append(pixmap)
             self.uic4.spinBox.setValue(0)
 
-    def undoRotate(self):
-        pass
-
     def FilterEvent(self):
         if self.fname != '':
             self.runCloseDialogs()
@@ -517,7 +511,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.uic5.pushButton.clicked.connect(self.eventfilter)
             self.uic5.pushButton_2.clicked.connect(self.eventfilter)
-            self.uic5.pushButton_3.clicked.connect(self.eventfilter)
             self.uic5.pushButton_4.clicked.connect(self.eventfilter)
             self.uic5.pushButton_5.clicked.connect(self.eventfilter)
             self.uic5.pushButton_7.clicked.connect(self.eventfilter)
@@ -546,7 +539,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif btn == self.uic5.pushButton_8:
                 temp_image = myImage.filter(ImageFilter.SMOOTH)
             else:
-                self.undo()
+                pass
 
             if temp_image is not None:
                 im = temp_image.convert("RGBA")
@@ -589,7 +582,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imgScreen.setPixmap(self.listPixMap[-1])
                 self.currentPixmap = self.listPixMap[-1]
                 super().closeEvent(event)
-        
+
     def applyHistoryEvent(self):
         if self.listPixMap:
             answer = QtWidgets.QMessageBox.question(
@@ -607,7 +600,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.currentPixmap = self.listPixMap[-1]
                 self.Seventh_window.accept()
             pass
-        else: self.Seventh_window.accept()
+        else:
+            self.Seventh_window.accept()
 
     def historySelectionEvent(self, item):
         # Lấy giá trị width height của ảnh default
@@ -650,7 +644,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.Eighth_window.show()
             # Các event
             self.uic7.pushButton.clicked.connect(self.resizeImageEvent)
-            self.uic7.pushButton_2.clicked.connect(self.undo)
 
     def resizeImageEvent(self):
         # Điều chỉnh pixmap hiện tại theo scale lấy được từ 2 input width height
@@ -679,6 +672,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item = items[i]
             if isinstance(item, QtWidgets.QDialog) and item.isVisible():
                 item.setVisible(False)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

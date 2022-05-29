@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(400, 444)
+        Dialog.resize(400, 336)
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(20, 30, 361, 91))
         self.pushButton.setObjectName("pushButton")
@@ -31,9 +31,6 @@ class Ui_Dialog(object):
         self.spinBox.setFont(font)
         self.spinBox.setMaximum(360)
         self.spinBox.setObjectName("spinBox")
-        self.pushButton_4 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_4.setGeometry(QtCore.QRect(20, 340, 361, 91))
-        self.pushButton_4.setObjectName("pushButton_4")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -44,7 +41,6 @@ class Ui_Dialog(object):
         self.pushButton.setText(_translate("Dialog", "Vertical"))
         self.pushButton_2.setText(_translate("Dialog", "Horizontal"))
         self.pushButton_3.setText(_translate("Dialog", "Rotate"))
-        self.pushButton_4.setText(_translate("Dialog", "Undo"))
 
 
 if __name__ == "__main__":

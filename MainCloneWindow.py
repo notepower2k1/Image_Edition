@@ -70,6 +70,7 @@ class Ui_MainWindow(object):
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.toolBar_2 = QtWidgets.QToolBar(MainWindow)
         self.toolBar_2.setObjectName("toolBar_2")
+        self.toolBar_2.setMovable(False)
         MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.toolBar_2)
         self.actionOpen = QtWidgets.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
@@ -94,6 +95,8 @@ class Ui_MainWindow(object):
         self.actionlabel.setObjectName("actionlabel")
         self.actionResize = QtWidgets.QAction(MainWindow)
         self.actionResize.setObjectName("actionResize")
+        self.actionUndo = QtWidgets.QAction(MainWindow)
+        self.actionUndo.setObjectName("actionUndo")
         self.actionHistory = QtWidgets.QAction(MainWindow)
         self.actionHistory.setObjectName("actionHistory")
         self.menuFile.addAction(self.actionOpen)
@@ -108,6 +111,7 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionCrop)
         self.toolBar.addAction(self.actionResize)
         self.toolBar.addAction(self.actionHistory)
+        self.toolBar.addAction(self.actionUndo)
         self.toolBar.addAction(self.actionClear)
         self.toolBar_2.addAction(self.actionlabel)
         self.toolBar.addWidget(right_spacer)
@@ -116,7 +120,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Image Simple Editor"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.toolBar_2.setWindowTitle(_translate("MainWindow", "toolBar_2"))
@@ -130,6 +134,7 @@ class Ui_MainWindow(object):
         self.actionCrop.setText(_translate("MainWindow", "Crop"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionResize.setText(_translate("MainWindow", "Resize"))
+        self.actionUndo.setText(_translate("MainWindow","Undo"))
         self.actionHistory.setText(_translate("MainWindow", "History"))
 
         MainWindow.showMaximized()

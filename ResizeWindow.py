@@ -38,11 +38,8 @@ class Ui_ResizeDialog(object):
         self.sbHeight.setMaximum(100000)
         self.sbHeight.setObjectName("sbHeight")
         self.pushButton = QtWidgets.QPushButton(ResizeDialog)
-        self.pushButton.setGeometry(QtCore.QRect(30, 150, 121, 41))
+        self.pushButton.setGeometry(QtCore.QRect(30, 150, 271, 51))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(ResizeDialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(170, 150, 131, 41))
-        self.pushButton_2.setObjectName("pushButton_2")
 
         self.retranslateUi(ResizeDialog)
         QtCore.QMetaObject.connectSlotsByName(ResizeDialog)
@@ -53,7 +50,6 @@ class Ui_ResizeDialog(object):
         self.label.setText(_translate("ResizeDialog", "Width(px):"))
         self.label_2.setText(_translate("ResizeDialog", "Height(px):"))
         self.pushButton.setText(_translate("ResizeDialog", "Apply"))
-        self.pushButton_2.setText(_translate("ResizeDialog", "Undo"))
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FilterDialog(object):
     def setupUi(self, FilterDialog):
         FilterDialog.setObjectName("FilterDialog")
-        FilterDialog.resize(321, 236)
+        FilterDialog.resize(321, 170)
         self.pushButton = QtWidgets.QPushButton(FilterDialog)
         self.pushButton.setGeometry(QtCore.QRect(9, 9, 131, 41))
         self.pushButton.setObjectName("pushButton")
@@ -33,9 +33,6 @@ class Ui_FilterDialog(object):
         self.pushButton_8 = QtWidgets.QPushButton(FilterDialog)
         self.pushButton_8.setGeometry(QtCore.QRect(160, 60, 141, 41))
         self.pushButton_8.setObjectName("pushButton_8")
-        self.pushButton_3 = QtWidgets.QPushButton(FilterDialog)
-        self.pushButton_3.setGeometry(QtCore.QRect(10, 170, 291, 51))
-        self.pushButton_3.setObjectName("pushButton_3")
 
         self.retranslateUi(FilterDialog)
         QtCore.QMetaObject.connectSlotsByName(FilterDialog)
@@ -49,7 +46,6 @@ class Ui_FilterDialog(object):
         self.pushButton_5.setText(_translate("FilterDialog", "Detail"))
         self.pushButton_7.setText(_translate("FilterDialog", "Sharpen"))
         self.pushButton_8.setText(_translate("FilterDialog", "Smooth"))
-        self.pushButton_3.setText(_translate("FilterDialog", "Undo"))
 
 
 if __name__ == "__main__":

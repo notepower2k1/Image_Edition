@@ -15,7 +15,7 @@ class Ui_ColorTransfer_Form(object):
     def setupUi(self, ColorTransfer_Form):
         ColorTransfer_Form.setObjectName("ColorTransfer_Form")
         ColorTransfer_Form.setWindowModality(QtCore.Qt.NonModal)
-        ColorTransfer_Form.resize(210, 368)
+        ColorTransfer_Form.resize(210, 301)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -61,14 +61,6 @@ class Ui_ColorTransfer_Form(object):
         sizePolicy.setHeightForWidth(self.pushButton_5.sizePolicy().hasHeightForWidth())
         self.pushButton_5.setSizePolicy(sizePolicy)
         self.pushButton_5.setObjectName("pushButton_5")
-        self.pushButton_6 = QtWidgets.QPushButton(ColorTransfer_Form)
-        self.pushButton_6.setGeometry(QtCore.QRect(10, 300, 191, 51))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_6.sizePolicy().hasHeightForWidth())
-        self.pushButton_6.setSizePolicy(sizePolicy)
-        self.pushButton_6.setObjectName("pushButton_6")
 
         self.retranslateUi(ColorTransfer_Form)
         QtCore.QMetaObject.connectSlotsByName(ColorTransfer_Form)
@@ -81,7 +73,6 @@ class Ui_ColorTransfer_Form(object):
         self.pushButton_3.setText(_translate("ColorTransfer_Form", "Brown"))
         self.pushButton_4.setText(_translate("ColorTransfer_Form", "Green Cyan"))
         self.pushButton_5.setText(_translate("ColorTransfer_Form", "Magenta Pink"))
-        self.pushButton_6.setText(_translate("ColorTransfer_Form", "Undo"))
 
 
 if __name__ == "__main__":

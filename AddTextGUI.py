@@ -15,12 +15,11 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(410, 499)
-        Form.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint,False)
         self.textEdit = QtWidgets.QTextEdit(Form)
         self.textEdit.setGeometry(QtCore.QRect(20, 20, 371, 31))
         self.textEdit.setObjectName("textEdit")
         self.drawBtn = QtWidgets.QPushButton(Form)
-        self.drawBtn.setGeometry(QtCore.QRect(20, 430, 171, 51))
+        self.drawBtn.setGeometry(QtCore.QRect(20, 430, 371, 51))
         self.drawBtn.setObjectName("drawBtn")
         self.groupBox = QtWidgets.QGroupBox(Form)
         self.groupBox.setGeometry(QtCore.QRect(20, 100, 371, 114))
@@ -149,9 +148,6 @@ class Ui_Form(object):
         self.fontsizeSpinBox.setMinimum(1)
         self.fontsizeSpinBox.setProperty("value", 18)
         self.fontsizeSpinBox.setObjectName("fontsizeSpinBox")
-        self.btnUndo = QtWidgets.QPushButton(Form)
-        self.btnUndo.setGeometry(QtCore.QRect(220, 430, 171, 51))
-        self.btnUndo.setObjectName("btnUndo")
 
         self.retranslateUi(Form)
         self.GreenSlide.valueChanged['int'].connect(self.GreenSpinBox.setValue) # type: ignore
@@ -180,7 +176,6 @@ class Ui_Form(object):
         self.label_4.setText(_translate("Form", "X"))
         self.label_5.setText(_translate("Form", "Y"))
         self.label_6.setText(_translate("Form", "Font size"))
-        self.btnUndo.setText(_translate("Form", "Undo"))
 
 
 if __name__ == "__main__":
